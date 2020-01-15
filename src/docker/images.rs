@@ -25,7 +25,8 @@ impl Images {
     /// # Example
     /// ```no_run
     /// use longshoreman::Docker;
-    /// use async_std::File;
+    /// use async_std::fs::File;
+    /// # use futures_util::stream::StreamExt;
     /// # use std::error::Error;
     ///
     /// # #[tokio::main]
@@ -35,11 +36,14 @@ impl Images {
     ///
     /// let archive = File::open("path/to/archive.tar.gz").await?;
     ///
-    /// let mut images_stream = images_client.load(archive).with_progress();
+    /// let mut response_stream = images.load(archive).with_progress();
     ///
-    /// while let Some(response) = images_stream.next().await {
+    /// while let Some(response) = response_stream.next().await {
     ///     println!("{:?}", response?)
     /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn load<'a>(&'a self, tar_archive: impl AsyncRead + 'a) -> Load<'a> {
         Load::new(&self.http_client, tar_archive)
     }

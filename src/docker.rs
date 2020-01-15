@@ -32,7 +32,8 @@ impl Docker {
     /// constructs a new Docker instance for a docker host listening at a url
     /// specified by an env var `DOCKER_HOST`, falling back to
     /// `unix:///var/run/docker.sock`
-    #[must_use] pub fn new() -> Docker {
+    #[must_use]
+    pub fn new() -> Docker {
         match std::env::var("DOCKER_HOST").ok() {
             Some(host) => {
                 let host = host.parse().expect("invalid url");
@@ -110,7 +111,8 @@ impl Docker {
     ///
     /// let images = Docker::new().images();
     /// ```
-    #[must_use] pub fn images(&self) -> Images {
+    #[must_use]
+    pub fn images(&self) -> Images {
         Images::new(Arc::clone(&self.http_client))
     }
 }

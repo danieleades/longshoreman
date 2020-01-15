@@ -1,7 +1,6 @@
 use crate::http_client::HttpClient;
 use hyper::Uri;
-use std::path::PathBuf;
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 
 mod images;
 
@@ -19,8 +18,9 @@ impl Default for Docker {
 }
 
 impl Docker {
-    /// constructs a new Docker instance for a docker host listening at a url specified by an env var `DOCKER_HOST`,
-    /// falling back on unix:///var/run/docker.sock
+    /// constructs a new Docker instance for a docker host listening at a url
+    /// specified by an env var `DOCKER_HOST`, falling back on
+    /// unix:///var/run/docker.sock
     pub fn new() -> Docker {
         match std::env::var("DOCKER_HOST").ok() {
             Some(host) => {
@@ -42,7 +42,8 @@ impl Docker {
         Self { http_client }
     }
 
-    /// constructs a new Docker instance for docker host listening at the given host url
+    /// constructs a new Docker instance for docker host listening at the given
+    /// host url
     pub fn host(host: Uri) -> Docker {
         match host.scheme_str() {
             #[cfg(target_os = "linux")]

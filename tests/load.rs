@@ -1,5 +1,4 @@
-use async_std::fs::File;
-use async_std::stream::StreamExt;
+use async_std::{fs::File, stream::StreamExt};
 use longshoreman::Docker;
 
 #[tokio::test]

@@ -1,10 +1,8 @@
-use crate::http_client::HttpClient;
-use crate::Result;
+use crate::{http_client::HttpClient, Result};
 use futures_util::{
     future::TryFutureExt,
     io::{AsyncRead, AsyncReadExt},
-    stream::Stream,
-    stream::TryStreamExt,
+    stream::{Stream, TryStreamExt},
 };
 use serde::Deserialize;
 use std::pin::Pin;

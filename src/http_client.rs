@@ -1,7 +1,7 @@
 //! Transports for communicating with the docker daemon
 
-use std::path::PathBuf;
 use hyper::Method;
+use std::path::PathBuf;
 
 mod transport;
 use transport::Transport;

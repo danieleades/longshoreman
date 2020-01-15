@@ -1,7 +1,7 @@
 use crate::http_client::HttpClient;
 use hyper::Uri;
-use std::sync::Arc;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 mod images;
 

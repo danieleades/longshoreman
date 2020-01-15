@@ -1,8 +1,8 @@
-use async_std::io::prelude::*;
 use async_std::fs::File;
-use std::path::Path;
-use longshoreman::Docker;
+use async_std::io::prelude::*;
 use async_std::stream::StreamExt;
+use longshoreman::Docker;
+use std::path::Path;
 
 #[tokio::main]
 async fn main() {

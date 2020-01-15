@@ -7,6 +7,7 @@ use futures_util::{
 use serde::Deserialize;
 use std::pin::Pin;
 
+#[allow(missing_debug_implementations)]
 pub struct Load<'a> {
     http_client: &'a HttpClient,
     tar_archive: Pin<Box<dyn AsyncRead + 'a>>,
@@ -32,17 +33,19 @@ impl<'a> Load<'a> {
     ///
     /// this can be used for returning progress updates on the import process.
     pub fn with_progress(mut self) -> impl Stream<Item = Result<Status>> + 'a {
-        async move {
-            let bytes = self.read_archive().await?;
+        Box::pin(
+            async move {
+                let bytes = self.read_archive().await?;
 
-            Ok(self
-                .http_client
-                .post("/images/load")
-                .tar_body(bytes)
-                .query(&[("quiet", false)])
-                .into_stream_json())
-        }
-        .try_flatten_stream()
+                Ok(self
+                    .http_client
+                    .post("/images/load")
+                    .tar_body(bytes)
+                    .query(&[("quiet", false)])
+                    .into_stream_json())
+            }
+            .try_flatten_stream(),
+        )
     }
 
     /// Return a stream of tuples of imported images (`([image], [tag])`)

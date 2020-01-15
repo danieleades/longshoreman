@@ -29,21 +29,25 @@ impl HttpClient {
         Self::Uds(transport)
     }
 
-    pub fn request(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
+    fn request(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
         RequestBuilder::new(self, endpoint)
     }
-    pub fn get(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
-        RequestBuilder::new(self, endpoint).method(Method::GET)
-    }
+
+    /*     pub fn get(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
+        self.request(endpoint).method(Method::GET)
+    } */
+
     pub fn post(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
-        RequestBuilder::new(self, endpoint).method(Method::POST)
+        self.request(endpoint).method(Method::POST)
     }
-    pub fn put(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
-        RequestBuilder::new(&self, endpoint).method(Method::PUT)
-    }
-    pub fn delete<'a>(&'a self, endpoint: &'a str) -> RequestBuilder<'a> {
-        RequestBuilder::new(self, endpoint).method(Method::DELETE)
-    }
+
+    /*     pub fn put(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
+        self.request(endpoint).method(Method::PUT)
+    } */
+
+    /*     pub fn delete<'a>(&'a self, endpoint: &'a str) -> RequestBuilder<'a> {
+        self.request(endpoint).method(Method::DELETE)
+    } */
 
     fn transport(&self) -> &dyn Transport {
         match self {

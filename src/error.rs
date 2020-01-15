@@ -1,7 +1,7 @@
 //! Representations of various client errors
 
 use http;
-use hyper::{self, StatusCode};
+use hyper::StatusCode;
 use serde_json::Error as SerdeError;
 use std::{error::Error as StdError, fmt, io::Error as IoError, string::FromUtf8Error};
 use tokio_util::codec::{LengthDelimitedCodecError, LinesCodecError};
@@ -9,16 +9,39 @@ use tokio_util::codec::{LengthDelimitedCodecError, LinesCodecError};
 /// Represents the result of all docker operations
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// A 'catch-all' error for anything that can go wrong with this crate.
 #[derive(Debug)]
 pub enum Error {
+    #[doc(hidden)]
     SerdeJsonError(SerdeError),
+    /// Errors from the underlying Hyper crate
     Hyper(hyper::Error),
+
+    /// Low-level Http errors
     Http(http::Error),
+
+    /// Errors related to file I/O from the host OS
     IO(IoError),
+    #[doc(hidden)]
     Encoding(FromUtf8Error),
+
+    /// An invalid response form the docker API
     InvalidResponse(String),
-    Fault { code: StatusCode, message: String },
+
+    /// A canonical Http error response
+    Fault {
+        /// The canonical HTTP status code
+        code: StatusCode,
+
+        /// A descriptive string
+        message: String,
+    },
+
+    /// An error which occurs when an http connection fails to upgrade to TCP on
+    /// request
     ConnectionNotUpgraded,
+
+    #[doc(hidden)]
     Decode,
 }
 

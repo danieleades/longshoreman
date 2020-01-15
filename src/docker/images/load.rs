@@ -122,13 +122,13 @@ mod tests {
 
     #[test]
     fn status_deserialisation() {
-        let string = r#"{"status":"Loading layer","progressDetail":{"current":32768,"total":1292800},"progress":"[=                                                 ] 32.77 kB/1.293 MB","id":"8ac8bfaff55a"}"#;
+        let string1 = r#"{"status":"Loading layer","progressDetail":{"current":32768,"total":1292800},"progress":"[=                                                 ] 32.77 kB/1.293 MB","id":"8ac8bfaff55a"}"#;
 
-        let _: Status = serde_json::from_str(string).unwrap();
+        let _: Status = serde_json::from_str(string1).unwrap();
 
-        let string = r#"{"stream":"Loaded image: busybox:latest\n"}"#;
+        let string2 = r#"{"stream":"Loaded image: busybox:latest\n"}"#;
 
-        let _: Status = serde_json::from_str(string).unwrap();
+        let _: Status = serde_json::from_str(string2).unwrap();
     }
 
     #[test]

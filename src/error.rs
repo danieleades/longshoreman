@@ -13,7 +13,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug)]
 pub enum Error {
     #[doc(hidden)]
-    SerdeJsonError(SerdeError),
+    SerdeJson(SerdeError),
     /// Errors from the underlying Hyper crate
     Hyper(hyper::Error),
 
@@ -47,7 +47,7 @@ pub enum Error {
 
 impl From<SerdeError> for Error {
     fn from(error: SerdeError) -> Error {
-        Error::SerdeJsonError(error)
+        Error::SerdeJson(error)
     }
 }
 
@@ -108,7 +108,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Docker Error: ")?;
         match self {
-            Error::SerdeJsonError(err) => write!(f, "{}", err),
+            Error::SerdeJson(err) => write!(f, "{}", err),
             Error::Http(ref err) => write!(f, "{}", err),
             Error::Hyper(ref err) => write!(f, "{}", err),
             Error::IO(ref err) => write!(f, "{}", err),
@@ -129,7 +129,7 @@ impl fmt::Display for Error {
 impl StdError for Error {
     fn cause(&self) -> Option<&dyn StdError> {
         match self {
-            Error::SerdeJsonError(ref err) => Some(err),
+            Error::SerdeJson(ref err) => Some(err),
             Error::Http(ref err) => Some(err),
             Error::IO(ref err) => Some(err),
             Error::Encoding(e) => Some(e),

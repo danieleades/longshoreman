@@ -43,7 +43,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args: --all -- --check --edition=2018
+          args: --check
 
       - name: lint
         uses: actions-rs/cargo@v1

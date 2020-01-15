@@ -1,4 +1,4 @@
-use async_std::{fs::File, io::prelude::*, stream::StreamExt};
+use async_std::{fs::File, stream::StreamExt};
 use longshoreman::Docker;
 use std::path::Path;
 

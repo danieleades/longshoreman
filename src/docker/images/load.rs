@@ -7,6 +7,7 @@ use futures_util::{
 use serde::Deserialize;
 use std::pin::Pin;
 
+#[allow(missing_debug_implementations)]
 pub struct Load<'a> {
     http_client: &'a HttpClient,
     tar_archive: Pin<Box<dyn AsyncRead + 'a>>,
@@ -32,17 +33,19 @@ impl<'a> Load<'a> {
     ///
     /// this can be used for returning progress updates on the import process.
     pub fn with_progress(mut self) -> impl Stream<Item = Result<Status>> + 'a {
-        async move {
-            let bytes = self.read_archive().await?;
+        Box::pin(
+            async move {
+                let bytes = self.read_archive().await?;
 
-            Ok(self
-                .http_client
-                .post("/images/load")
-                .tar_body(bytes)
-                .query(&[("quiet", false)])
-                .into_stream_json())
-        }
-        .try_flatten_stream()
+                Ok(self
+                    .http_client
+                    .post("/images/load")
+                    .tar_body(bytes)
+                    .query(&[("quiet", false)])
+                    .into_stream_json())
+            }
+            .try_flatten_stream(),
+        )
     }
 
     /// Return a stream of tuples of imported images (`([image], [tag])`)
@@ -119,13 +122,13 @@ mod tests {
 
     #[test]
     fn status_deserialisation() {
-        let string = r#"{"status":"Loading layer","progressDetail":{"current":32768,"total":1292800},"progress":"[=                                                 ] 32.77 kB/1.293 MB","id":"8ac8bfaff55a"}"#;
+        let string1 = r#"{"status":"Loading layer","progressDetail":{"current":32768,"total":1292800},"progress":"[=                                                 ] 32.77 kB/1.293 MB","id":"8ac8bfaff55a"}"#;
 
-        let _: Status = serde_json::from_str(string).unwrap();
+        let _: Status = serde_json::from_str(string1).unwrap();
 
-        let string = r#"{"stream":"Loaded image: busybox:latest\n"}"#;
+        let string2 = r#"{"stream":"Loaded image: busybox:latest\n"}"#;
 
-        let _: Status = serde_json::from_str(string).unwrap();
+        let _: Status = serde_json::from_str(string2).unwrap();
     }
 
     #[test]

@@ -2,10 +2,21 @@ use crate::http_client::HttpClient;
 use hyper::Uri;
 use std::{path::PathBuf, sync::Arc};
 
-mod images;
+pub mod images;
 
 use images::Images;
 
+/// A Docker client.
+///
+/// The [`Docker`] client provides top-level API endpoints, and is used to
+/// instantiate the other clients.
+///
+/// # Example
+/// ```
+/// use longshoreman::Docker;
+///
+/// let docker_client = Docker::new();
+/// ```
 #[derive(Debug)]
 pub struct Docker {
     http_client: Arc<HttpClient>,
@@ -19,13 +30,14 @@ impl Default for Docker {
 
 impl Docker {
     /// constructs a new Docker instance for a docker host listening at a url
-    /// specified by an env var `DOCKER_HOST`, falling back on
-    /// unix:///var/run/docker.sock
+    /// specified by an env var `DOCKER_HOST`, falling back to
+    /// `unix:///var/run/docker.sock`
+    #[must_use]
     pub fn new() -> Docker {
         match std::env::var("DOCKER_HOST").ok() {
             Some(host) => {
                 let host = host.parse().expect("invalid url");
-                Self::host(host)
+                Self::host(&host)
             }
             #[cfg(target_os = "linux")]
             None => Self::unix(PathBuf::from("/var/run/docker.sock")),
@@ -44,7 +56,8 @@ impl Docker {
 
     /// constructs a new Docker instance for docker host listening at the given
     /// host url
-    pub fn host(host: Uri) -> Docker {
+    #[allow(clippy::single_match_else)]
+    pub fn host(host: &Uri) -> Docker {
         match host.scheme_str() {
             #[cfg(target_os = "linux")]
             Some("unix") => Self::unix(host.path().to_owned()),
@@ -88,6 +101,17 @@ impl Docker {
         Self { http_client }
     }
 
+    /// Return an [`Images`] client.
+    ///
+    /// See the [`Images`] client docs for more details
+    ///
+    /// # Example
+    /// ```
+    /// use longshoreman::Docker;
+    ///
+    /// let images = Docker::new().images();
+    /// ```
+    #[must_use]
     pub fn images(&self) -> Images {
         Images::new(Arc::clone(&self.http_client))
     }

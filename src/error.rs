@@ -1,7 +1,7 @@
 //! Representations of various client errors
 
 use http;
-use hyper::{self, StatusCode};
+use hyper::StatusCode;
 use serde_json::Error as SerdeError;
 use std::{error::Error as StdError, fmt, io::Error as IoError, string::FromUtf8Error};
 use tokio_util::codec::{LengthDelimitedCodecError, LinesCodecError};
@@ -9,22 +9,45 @@ use tokio_util::codec::{LengthDelimitedCodecError, LinesCodecError};
 /// Represents the result of all docker operations
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// A 'catch-all' error for anything that can go wrong with this crate.
 #[derive(Debug)]
 pub enum Error {
-    SerdeJsonError(SerdeError),
+    #[doc(hidden)]
+    SerdeJson(SerdeError),
+    /// Errors from the underlying Hyper crate
     Hyper(hyper::Error),
+
+    /// Low-level Http errors
     Http(http::Error),
+
+    /// Errors related to file I/O from the host OS
     IO(IoError),
+    #[doc(hidden)]
     Encoding(FromUtf8Error),
+
+    /// An invalid response form the docker API
     InvalidResponse(String),
-    Fault { code: StatusCode, message: String },
+
+    /// A canonical Http error response
+    Fault {
+        /// The canonical HTTP status code
+        code: StatusCode,
+
+        /// A descriptive string
+        message: String,
+    },
+
+    /// An error which occurs when an http connection fails to upgrade to TCP on
+    /// request
     ConnectionNotUpgraded,
+
+    #[doc(hidden)]
     Decode,
 }
 
 impl From<SerdeError> for Error {
     fn from(error: SerdeError) -> Error {
-        Error::SerdeJsonError(error)
+        Error::SerdeJson(error)
     }
 }
 
@@ -85,7 +108,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Docker Error: ")?;
         match self {
-            Error::SerdeJsonError(err) => write!(f, "{}", err),
+            Error::SerdeJson(err) => write!(f, "{}", err),
             Error::Http(ref err) => write!(f, "{}", err),
             Error::Hyper(ref err) => write!(f, "{}", err),
             Error::IO(ref err) => write!(f, "{}", err),
@@ -106,7 +129,7 @@ impl fmt::Display for Error {
 impl StdError for Error {
     fn cause(&self) -> Option<&dyn StdError> {
         match self {
-            Error::SerdeJsonError(ref err) => Some(err),
+            Error::SerdeJson(ref err) => Some(err),
             Error::Http(ref err) => Some(err),
             Error::IO(ref err) => Some(err),
             Error::Encoding(e) => Some(e),

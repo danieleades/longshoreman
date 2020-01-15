@@ -196,8 +196,7 @@ impl<'a> RequestBuilder<'a> {
         C: Decoder<Item = I, Error = E> + 'a,
         I: AsRef<[u8]> + 'a,
         Error: From<E>,
-        E: From<std::io::Error>,
-        E: 'a,
+        E: From<std::io::Error> + 'a,
     {
         let stream = Box::pin(
             self.into_stream()

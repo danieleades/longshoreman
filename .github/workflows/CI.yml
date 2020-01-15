@@ -74,13 +74,6 @@ jobs:
       - name: checkout source
         uses: actions/checkout@v2
 
-      - name: install nightly toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-          components: tarpaulin
-
       - name: check code coverage
         uses: actions-rs/tarpaulin@v0.1
         with:

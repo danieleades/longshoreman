@@ -56,7 +56,6 @@ impl<'a> Load<'a> {
             } else {
                 None
             };
-
             Ok(ret)
         })
     }

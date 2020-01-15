@@ -16,17 +16,13 @@ jobs:
           profile: minimal
           toolchain: nightly
           override: true
-          components:
-            - clippy
-            - rustfmt
-            - tarpaulin
+          components: clippy, rustfmt, tarpaulin
 
       - name: check formatting
         uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args:
-            - --all -- --check
+          args: --all -- --check
 
       - name: check code
         uses: actions-rs/cargo@v1

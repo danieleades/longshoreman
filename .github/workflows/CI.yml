@@ -14,6 +14,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+          override: true
 
       - name: check code
         uses: actions-rs/cargo@v1
@@ -36,6 +37,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+          override: true
           components: rustfmt, clippy
 
       - name: check formatting

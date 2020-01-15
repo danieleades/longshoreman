@@ -1,0 +1,83 @@
+on: [push, pull_request]
+
+name: CI
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source
+        uses: actions/checkout@v2
+
+      - name: install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+
+      - name: check code
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+
+      - name: test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+  format:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source
+        uses: actions/checkout@v2
+
+      - name: install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          components: rustfmt
+
+      - name: check formatting
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
+
+  lint:
+    name: Clippy Lints
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: checkout source
+        uses: actions/checkout@v2
+
+      - name: install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          components: clippy
+
+      - name: lint
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+
+  coverage:
+    name: Test Coverage
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: checkout source
+        uses: actions/checkout@v2
+
+      - name: check code coverage
+        uses: actions-rs/tarpaulin@v0.1
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v1.0.2
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}

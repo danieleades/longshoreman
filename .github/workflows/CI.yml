@@ -1,83 +1,95 @@
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
 
-name: CI
+name: Continuous integration
 
 jobs:
-  test:
-    name: Test
+  check:
+    name: Check
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - nightly
+          - 1.39.0 # MSRV
     steps:
-      - name: checkout source
-        uses: actions/checkout@v2
-
-      - name: install nightly toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
           override: true
-
-      - name: check code
-        uses: actions-rs/cargo@v1
+      - uses: actions-rs/cargo@v1
         with:
           command: check
 
-      - name: test
-        uses: actions-rs/cargo@v1
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - nightly
+          - 1.39.0 # MSRV
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - uses: actions-rs/cargo@v1
         with:
           command: test
+          args: --all-features
 
-  format:
-    name: Check Formatting
+  fmt:
+    name: Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - name: checkout source
-        uses: actions/checkout@v2
-
-      - name: install nightly toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           override: true
+          profile: minimal
           components: rustfmt
-
-      - name: check formatting
-        uses: actions-rs/cargo@v1
+      - uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args: -- --check
+          args: --all -- --check
 
-  lint:
-    name: Clippy Lints
+  clippy:
+    name: Clippy
     runs-on: ubuntu-latest
     steps:
-
-      - name: checkout source
-        uses: actions/checkout@v2
-
-      - name: install nightly toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           override: true
+          profile: minimal
           components: clippy
-
-      - name: lint
-        uses: actions-rs/cargo@v1
+      - uses: actions-rs/cargo@v1
         with:
           command: clippy
 
-  coverage:
-    name: Test Coverage
+  docs:
+    name: Docs
     runs-on: ubuntu-latest
     steps:
-
-      - name: checkout source
-        uses: actions/checkout@v2
-
-      - name: check code coverage
-        uses: actions-rs/tarpaulin@v0.1
-
-      - name: Upload to codecov.io
-        uses: codecov/codecov-action@v1.0.2
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
+          toolchain: stable
+          override: true
+          profile: minimal
+      - uses: actions-rs/cargo@v1
+        with:
+          command: doc
+          args: --no-deps
+

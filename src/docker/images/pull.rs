@@ -5,7 +5,25 @@ use tokio::stream::Stream;
 
 /// A request to pull an image
 ///
-/// # Example
+/// # Examples
+///
+/// ## Simple
+///
+/// ```no_run
+/// use longshoreman::{Docker, Result};
+/// use tokio::stream::StreamExt;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<()> {
+///     let images = Docker::new().images();
+///
+///     // Pull an image and wait until the operation is complete
+///     images.pull("ubuntu").tag("latest").send().await
+/// }
+/// ```
+///
+/// ## Further Options
+///
 /// ```no_run
 /// use longshoreman::{Docker, Result};
 /// use tokio::stream::StreamExt;

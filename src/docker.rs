@@ -6,6 +6,8 @@ pub mod images;
 
 use images::Images;
 
+pub mod containers;
+
 /// A Docker client.
 ///
 /// The [`Docker`] client provides top-level API endpoints, and is used to

@@ -5,14 +5,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug)]
 pub struct Create<'a> {
     http_client: &'a HttpClient,
-    query: Query,
-    body: Body,
+    query: Query<'a>,
+    body: Body<'a>,
 }
 
 impl<'a> Create<'a> {
-    pub(crate) fn new(http_client: &'a HttpClient) -> Self {
-        let query = Query {};
-        let body = Body {};
+    pub(crate) fn new(http_client: &'a HttpClient, image: &'a str) -> Self {
+        let query = Query::default();
+        let body = Body::new(image);
         Self {
             http_client,
             query,
@@ -20,10 +20,18 @@ impl<'a> Create<'a> {
         }
     }
 
+    /// Set the name of the container
+    ///
+    /// Allowed name must match `/?[a-zA-Z0-9][a-zA-Z0-9_.-]+`
+    pub fn name(mut self, name: &'a str) -> Self {
+        self.query.name = Some(name);
+        self
+    }
+
     /// Consume the request builder and return a [`Response`]
     pub async fn send(self) -> Result<Response> {
         self.http_client
-            .post("containers/create")
+            .post("/containers/create")
             .query(self.query)
             .json_body(self.body)
             .into_json()
@@ -31,17 +39,38 @@ impl<'a> Create<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
-struct Query {}
+#[derive(Debug, Default, Serialize)]
+struct Query<'a> {
+    name: Option<&'a str>,
+}
 
 #[derive(Debug, Serialize)]
-struct Body {}
+#[serde(rename_all = "PascalCase")]
+struct Body<'a> {
+    image: &'a str,
+}
+
+impl<'a> Body<'a> {
+    fn new(image: &'a str) -> Self {
+        Self { image }
+    }
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Response {
     id: String,
     warnings: Vec<String>,
+}
+
+impl Response {
+    pub fn id(&self) -> &String {
+        &self.id
+    }
+
+    pub fn warnings(&self) -> &Vec<String> {
+        &self.warnings
+    }
 }
 
 #[cfg(test)]

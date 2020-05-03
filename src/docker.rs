@@ -3,8 +3,10 @@ use hyper::Uri;
 use std::{path::PathBuf, sync::Arc};
 
 pub mod images;
-
 use images::Images;
+
+pub mod containers;
+use containers::Containers;
 
 /// A Docker client.
 ///
@@ -114,5 +116,20 @@ impl Docker {
     #[must_use]
     pub fn images(&self) -> Images {
         Images::new(Arc::clone(&self.http_client))
+    }
+
+    /// Return an [`Containers`] client.
+    ///
+    /// See the [`Containers`] client docs for more details
+    ///
+    /// # Example
+    /// ```
+    /// use longshoreman::Docker;
+    ///
+    /// let containers = Docker::new().containers();
+    /// ```
+    #[must_use]
+    pub fn containers(&self) -> Containers {
+        Containers::new(Arc::clone(&self.http_client))
     }
 }

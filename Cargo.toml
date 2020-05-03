@@ -10,7 +10,7 @@ edition = "2018"
 hyper = "0.13.5"
 pin-project = "0.4.9"
 futures-util = { version = "0.3.4", features = ["io"] }
-tokio = "0.2.20"
+tokio = {version = "0.2.20", features = ["stream", "io-util"]}
 serde = { version = "1.0.106", features = ["derive"] }
 tokio-util = { version = "0.3.1", features = ["codec"] }
 http = "0.2.1"
@@ -22,5 +22,4 @@ serde_urlencoded = "0.6.1"
 hyperlocal = "0.7.0"
 
 [dev-dependencies]
-async-std = { version = "1.5.0", features = [] }
 tokio = { version = "0.2.20", features = ["macros", "rt-threaded", "fs"] }

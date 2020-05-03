@@ -1,11 +1,11 @@
 use crate::{http_client::HttpClient, Result};
 use futures_util::{
     future::TryFutureExt,
-    io::{AsyncRead, AsyncReadExt},
     stream::{Stream, TryStreamExt},
 };
 use serde::Deserialize;
 use std::pin::Pin;
+use tokio::io::{AsyncRead, AsyncReadExt};
 
 #[allow(missing_debug_implementations)]
 pub struct Load<'a> {

@@ -1,8 +1,7 @@
 use super::{BodyType, HttpClient};
-use crate::{Compat, Error, Result};
+use crate::{Error, Result};
 use futures_util::{
     future::TryFutureExt,
-    io::{AsyncRead, AsyncWrite},
     stream::{Stream, StreamExt, TryStreamExt},
 };
 use hyper::{
@@ -12,6 +11,7 @@ use hyper::{
 };
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, io};
+use tokio::io::{stream_reader, AsyncRead, AsyncWrite};
 use tokio_util::codec::{Decoder, FramedRead};
 
 pub(crate) struct RequestBuilder<'a> {
@@ -142,9 +142,7 @@ impl<'a> RequestBuilder<'a> {
         let hyper_response = self.into_response().await?;
 
         match hyper_response.status() {
-            StatusCode::SWITCHING_PROTOCOLS => {
-                Ok(Compat::new(hyper_response.into_body().on_upgrade().await?))
-            }
+            StatusCode::SWITCHING_PROTOCOLS => Ok(hyper_response.into_body().on_upgrade().await?),
             _ => Err(Error::ConnectionNotUpgraded),
         }
     }
@@ -198,11 +196,11 @@ impl<'a> RequestBuilder<'a> {
         Error: From<E>,
         E: From<std::io::Error> + 'a,
     {
-        let stream = Box::pin(
-            self.into_stream()
-                .map_err(|e| io::Error::new(io::ErrorKind::Other, e)),
-        );
-        let reader = Compat::new(stream.into_async_read());
+        let stream = self
+            .into_stream()
+            .map_err(|e| io::Error::new(io::ErrorKind::Other, e));
+
+        let reader = stream_reader(stream);
         FramedRead::new(reader, codec)
             .map_err(Error::from)
             .and_then(|bytes| async move { Ok(serde_json::from_slice(bytes.as_ref())?) })

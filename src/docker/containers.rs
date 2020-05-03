@@ -18,6 +18,7 @@ impl Containers {
     }
 
     /// Create a new Docker container
+    #[must_use]
     pub fn create<'a>(&'a self, image: &'a str) -> Create<'a> {
         Create::new(&self.http_client, image)
     }

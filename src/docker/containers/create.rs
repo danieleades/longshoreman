@@ -2,6 +2,28 @@ use crate::{http_client::HttpClient, Result};
 use serde::{Deserialize, Serialize};
 
 /// A request to create a new docker container
+///
+/// # Example
+/// ```no_run
+/// use longshoreman::{Docker, Result};
+///
+/// #[tokio::main]
+/// async fn main() -> Result<()> {
+///     let containers = Docker::new().containers();
+///
+///     // Create a simple container
+///     containers.create("alpine").send().await?;
+///
+///     // Create a more complex example
+///     containers
+///         .create("alpine")
+///         .name("my-cool-container")
+///         .send()
+///         .await?;
+///
+///     Ok(())
+/// }
+/// ```
 #[derive(Debug)]
 pub struct Create<'a> {
     http_client: &'a HttpClient,
@@ -23,6 +45,7 @@ impl<'a> Create<'a> {
     /// Set the name of the container
     ///
     /// Allowed name must match `/?[a-zA-Z0-9][a-zA-Z0-9_.-]+`
+    #[must_use]
     pub fn name(mut self, name: &'a str) -> Self {
         self.query.name = Some(name);
         self

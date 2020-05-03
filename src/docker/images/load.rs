@@ -7,6 +7,7 @@ use serde::Deserialize;
 use std::pin::Pin;
 use tokio::io::{AsyncRead, AsyncReadExt};
 
+/// A request to load an image or images from a tar archive.
 #[allow(missing_debug_implementations)]
 pub struct Load<'a> {
     http_client: &'a HttpClient,

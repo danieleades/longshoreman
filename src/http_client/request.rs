@@ -57,17 +57,22 @@ impl<'a> RequestBuilder<'a> {
 
     // Builder methods
 
+    /// Set the HTTP method
     pub fn method(mut self, method: Method) -> Self {
         self.builder = self.builder.method(method);
         self
     }
 
+    /// Add a custom header to the request
     pub fn header(mut self, key: impl IntoHeaderName, value: &str) -> Self {
         let value = http::header::HeaderValue::from_str(value).unwrap();
         self.builder.headers_mut().unwrap().append(key, value);
         self
     }
 
+    /// Add a form-encoded query to the request.
+    ///
+    /// Any type that implements [`serde::Deserialize`] can be used
     pub fn query<T: Serialize>(mut self, query: T) -> Self {
         let query_string = serde_urlencoded::ser::to_string(query).unwrap();
 
@@ -75,12 +80,19 @@ impl<'a> RequestBuilder<'a> {
         self
     }
 
+    /// Add a JSON body to the request.
+    ///
+    /// Any type that implements [`serde::Deserialize`] can be used. This method
+    /// will automatically set the content type header
     pub fn json_body<T: Serialize>(mut self, body: T) -> Self {
         let data = serde_json::to_vec(&body).unwrap();
         self.body = Some(BodyType::json(data));
         self
     }
 
+    /// Add a tar archive as the body of the request
+    ///
+    /// This method will automatically set the content type header
     pub fn tar_body(mut self, data: Vec<u8>) -> Self {
         self.body = Some(BodyType::tar(data));
         self
@@ -88,6 +100,7 @@ impl<'a> RequestBuilder<'a> {
 
     // Finalisers
 
+    /// Build the request
     fn into_request(self) -> Result<(Request<Body>, &'a HttpClient)> {
         let uri = if let Some(query_string) = &self.query {
             format!("{}?{}", self.uri_base, query_string)
@@ -95,12 +108,8 @@ impl<'a> RequestBuilder<'a> {
             self.uri_base
         };
 
-        println!("uri: {}", &uri);
-
         let mut builder = self.builder;
-        debug_assert!(builder.method_ref().is_some());
         builder = builder.uri(uri);
-        debug_assert!(builder.method_ref().is_some());
 
         let request = match self.body {
             Some(body_type) => {
@@ -117,11 +126,16 @@ impl<'a> RequestBuilder<'a> {
         Ok((request, self.http_client))
     }
 
+    /// Send the request and return a [`hyper::Result']
     pub async fn into_response(self) -> Result<hyper::Response<Body>> {
         let (request, client) = self.into_request()?;
         Ok(client.send_request(request).await?)
     }
 
+    /// Send the request and return the body of the response.
+    ///
+    /// This method will check the status code of the response convert it into
+    /// an error, as required.
     async fn into_body(self) -> Result<Body> {
         let response = self.into_response().await?;
         let status = response.status();
@@ -149,6 +163,7 @@ impl<'a> RequestBuilder<'a> {
         }
     }
 
+    /// Upgrade the HTTP connection into a duplex stream
     pub async fn upgrade(mut self) -> Result<impl AsyncRead + AsyncWrite> {
         self = self.header(hyper::header::CONNECTION, "Upgrade");
         self = self.header(hyper::header::UPGRADE, "tcp");
@@ -161,16 +176,19 @@ impl<'a> RequestBuilder<'a> {
         }
     }
 
+    /// Send the request and concatenate the response into a Bytes object
     async fn into_bytes(self) -> Result<Bytes> {
         let body = self.into_body().await?;
         Ok(to_bytes(body).await?)
     }
 
+    /// Send the request, and concatenate the response into a string
     pub async fn into_string(self) -> Result<String> {
         let bytes = self.into_bytes().await?;
         Ok(String::from_utf8(bytes.to_vec())?)
     }
 
+    /// Send the request and deserialize the JSON body response into an object
     pub async fn into_json<T>(self) -> Result<T>
     where
         for<'de> T: Deserialize<'de>,
@@ -179,6 +197,7 @@ impl<'a> RequestBuilder<'a> {
         Ok(serde_json::from_slice(&bytes)?)
     }
 
+    /// Send the request, and return the response body as a stream of bytes
     pub fn into_stream(self) -> impl Stream<Item = Result<Bytes>> + 'a {
         async fn unfold(mut body: Body) -> Option<(Result<Bytes>, Body)> {
             let bytes_result = body.next().await?.map_err(Error::from);
@@ -193,6 +212,8 @@ impl<'a> RequestBuilder<'a> {
         .try_flatten_stream()
     }
 
+    /// Send the request, and deserialize the returned stream of JSON into a
+    /// stream of objects.
     pub fn into_stream_json<T>(self) -> impl Stream<Item = Result<T>> + 'a
     where
         for<'de> T: Deserialize<'de>,
@@ -202,6 +223,8 @@ impl<'a> RequestBuilder<'a> {
         byte_stream.and_then(|bytes| async move { Ok(serde_json::from_slice(&bytes)?) })
     }
 
+    /// Send the request, and deserialize the returned stream using the given
+    /// codec
     pub fn decode<T, C, I, E>(self, codec: C) -> impl Stream<Item = Result<T>> + 'a
     where
         for<'de> T: Deserialize<'de>,

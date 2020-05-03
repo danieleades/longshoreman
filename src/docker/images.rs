@@ -1,8 +1,8 @@
 //! Endpoints and objects for juggling Docker images
 
 use crate::http_client::HttpClient;
-use futures_util::io::AsyncRead;
 use std::sync::Arc;
+use tokio::io::AsyncRead;
 
 mod load;
 use load::Load;
@@ -25,7 +25,7 @@ impl Images {
     /// # Example
     /// ```no_run
     /// use longshoreman::Docker;
-    /// use async_std::fs::File;
+    /// use tokio::fs::File;
     /// # use futures_util::stream::StreamExt;
     /// # use std::error::Error;
     ///

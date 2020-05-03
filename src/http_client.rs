@@ -45,9 +45,9 @@ impl HttpClient {
         self.request(endpoint).method(Method::PUT)
     } */
 
-    /*     pub fn delete<'a>(&'a self, endpoint: &'a str) -> RequestBuilder<'a> {
+    pub fn delete<'a>(&'a self, endpoint: &'a str) -> RequestBuilder<'a> {
         self.request(endpoint).method(Method::DELETE)
-    } */
+    }
 
     fn transport(&self) -> &dyn Transport {
         match self {

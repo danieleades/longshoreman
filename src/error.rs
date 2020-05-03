@@ -1,33 +1,41 @@
 //! Representations of various client errors
 
 use hyper::StatusCode;
-use serde_json::Error as SerdeError;
-use std::{error::Error as StdError, fmt, io::Error as IoError, string::FromUtf8Error};
+use std::{io, string::FromUtf8Error};
 use tokio_util::codec::{LengthDelimitedCodecError, LinesCodecError};
 
 /// Represents the result of all docker operations
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// A 'catch-all' error for anything that can go wrong with this crate.
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[doc(hidden)]
-    SerdeJson(SerdeError),
+    /// Errors that occur when serialising/deserialising from JSON
+    #[error(transparent)]
+    SerdeJson(#[from] serde_json::Error),
+
     /// Errors from the underlying Hyper crate
-    Hyper(hyper::Error),
+    #[error(transparent)]
+    Hyper(#[from] hyper::Error),
 
     /// Low-level Http errors
-    Http(http::Error),
+    #[error(transparent)]
+    Http(#[from] http::Error),
 
     /// Errors related to file I/O from the host OS
-    IO(IoError),
-    #[doc(hidden)]
-    Encoding(FromUtf8Error),
+    #[error(transparent)]
+    IO(#[from] io::Error),
 
-    /// An invalid response form the docker API
+    /// Utf8 encoding errors
+    #[error(transparent)]
+    Encoding(#[from] FromUtf8Error),
+
+    /// invalid response error
+    #[error("Response doesn't have the expected format: {0}")]
     InvalidResponse(String),
 
-    /// A canonical Http error response
+    /// Canonical HTTP errors
+    #[error("{code}: {message}")]
     Fault {
         /// The canonical HTTP status code
         code: StatusCode,
@@ -36,30 +44,13 @@ pub enum Error {
         message: String,
     },
 
-    /// An error which occurs when an http connection fails to upgrade to TCP on
-    /// request
+    /// Error when the docker host fails to upgrade the HTTP connection
+    #[error("expected the docker host to upgrade the HTTP connection but it did not")]
     ConnectionNotUpgraded,
 
-    #[doc(hidden)]
+    /// Errors that occur when decoding byte streams
+    #[error("failed to decode bytes")]
     Decode,
-}
-
-impl From<SerdeError> for Error {
-    fn from(error: SerdeError) -> Error {
-        Error::SerdeJson(error)
-    }
-}
-
-impl From<hyper::Error> for Error {
-    fn from(error: hyper::Error) -> Error {
-        Error::Hyper(error)
-    }
-}
-
-impl From<http::Error> for Error {
-    fn from(error: http::Error) -> Error {
-        Error::Http(error)
-    }
 }
 
 impl From<http::uri::InvalidUri> for Error {
@@ -76,18 +67,6 @@ impl From<http::header::InvalidHeaderValue> for Error {
     }
 }
 
-impl From<IoError> for Error {
-    fn from(error: IoError) -> Error {
-        Error::IO(error)
-    }
-}
-
-impl From<FromUtf8Error> for Error {
-    fn from(error: FromUtf8Error) -> Error {
-        Error::Encoding(error)
-    }
-}
-
 impl From<LinesCodecError> for Error {
     fn from(error: LinesCodecError) -> Self {
         match error {
@@ -100,39 +79,5 @@ impl From<LinesCodecError> for Error {
 impl From<LengthDelimitedCodecError> for Error {
     fn from(_error: LengthDelimitedCodecError) -> Self {
         Self::Decode
-    }
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Docker Error: ")?;
-        match self {
-            Error::SerdeJson(err) => write!(f, "{}", err),
-            Error::Http(ref err) => write!(f, "{}", err),
-            Error::Hyper(ref err) => write!(f, "{}", err),
-            Error::IO(ref err) => write!(f, "{}", err),
-            Error::Encoding(ref err) => write!(f, "{}", err),
-            Error::InvalidResponse(ref cause) => {
-                write!(f, "Response doesn't have the expected format: {}", cause)
-            }
-            Error::Fault { code, .. } => write!(f, "{}", code),
-            Error::ConnectionNotUpgraded => write!(
-                f,
-                "expected the docker host to upgrade the HTTP connection but it did not"
-            ),
-            Error::Decode => write!(f, "failed to decode bytes"),
-        }
-    }
-}
-
-impl StdError for Error {
-    fn cause(&self) -> Option<&dyn StdError> {
-        match self {
-            Error::SerdeJson(ref err) => Some(err),
-            Error::Http(ref err) => Some(err),
-            Error::IO(ref err) => Some(err),
-            Error::Encoding(e) => Some(e),
-            _ => None,
-        }
     }
 }

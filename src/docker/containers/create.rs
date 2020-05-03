@@ -43,3 +43,20 @@ pub struct Response {
     id: String,
     warnings: Vec<String>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Response;
+
+    #[test]
+    fn deserialize_response() {
+        let response_string = r#"
+        {
+            "Id": "e90e34656806",
+            "Warnings": []
+          }
+        "#;
+
+        let _: Response = serde_json::from_str(response_string).unwrap();
+    }
+}

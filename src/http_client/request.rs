@@ -82,7 +82,8 @@ impl<'a> RequestBuilder<'a> {
 
     /// Add a JSON body to the request.
     ///
-    /// Any type that implements [`serde::Deserialize`] can be used. This method will automatically set the content type header
+    /// Any type that implements [`serde::Deserialize`] can be used. This method
+    /// will automatically set the content type header
     pub fn json_body<T: Serialize>(mut self, body: T) -> Self {
         let data = serde_json::to_vec(&body).unwrap();
         self.body = Some(BodyType::json(data));
@@ -133,7 +134,8 @@ impl<'a> RequestBuilder<'a> {
 
     /// Send the request and return the body of the response.
     ///
-    /// This method will check the status code of the response convert it into an error, as required.
+    /// This method will check the status code of the response convert it into
+    /// an error, as required.
     async fn into_body(self) -> Result<Body> {
         let response = self.into_response().await?;
         let status = response.status();
@@ -210,7 +212,8 @@ impl<'a> RequestBuilder<'a> {
         .try_flatten_stream()
     }
 
-    /// Send the request, and deserialize the returned stream of JSON into a stream of objects.
+    /// Send the request, and deserialize the returned stream of JSON into a
+    /// stream of objects.
     pub fn into_stream_json<T>(self) -> impl Stream<Item = Result<T>> + 'a
     where
         for<'de> T: Deserialize<'de>,
@@ -220,7 +223,8 @@ impl<'a> RequestBuilder<'a> {
         byte_stream.and_then(|bytes| async move { Ok(serde_json::from_slice(&bytes)?) })
     }
 
-    /// Send the request, and deserialize the returned stream using the given codec
+    /// Send the request, and deserialize the returned stream using the given
+    /// codec
     pub fn decode<T, C, I, E>(self, codec: C) -> impl Stream<Item = Result<T>> + 'a
     where
         for<'de> T: Deserialize<'de>,

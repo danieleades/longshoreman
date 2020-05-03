@@ -14,6 +14,20 @@ use std::{convert::TryFrom, io};
 use tokio::io::{stream_reader, AsyncRead, AsyncWrite};
 use tokio_util::codec::{Decoder, FramedRead};
 
+/// A builder API for constructing and sending an HTTP request to the Docker
+/// host.
+///
+/// ## Builder Methods
+/// This object has a number of 'builder' methods for building the request.
+/// These are modelled after `Reqwest`'s API.
+///
+/// ## Finalisers
+/// A number of 'finaliser' methods are provided for turning the received
+/// responses into different response types, depending on needs of the endpoint.
+/// These include unary responses, streams, and decoding into JSON objects.
+///
+/// Implementations of specific endpoints may make use of these finalisers, and
+/// need not reimplement this logic.
 pub(crate) struct RequestBuilder<'a> {
     http_client: &'a HttpClient,
     uri_base: String,

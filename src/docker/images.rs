@@ -5,7 +5,10 @@ use std::sync::Arc;
 use tokio::io::AsyncRead;
 
 mod load;
-use load::Load;
+pub use load::Load;
+
+mod pull;
+pub use pull::Pull;
 
 /// A client to the 'images' subset of Docker API endpoints
 #[derive(Debug)]
@@ -46,5 +49,11 @@ impl Images {
     /// ```
     pub fn load<'a>(&'a self, tar_archive: impl AsyncRead + 'a) -> Load<'a> {
         Load::new(&self.http_client, tar_archive)
+    }
+
+    /// Pull an image
+    #[must_use]
+    pub fn pull<'a>(&'a self, name: &'a str) -> Pull<'a> {
+        Pull::new(&self.http_client, name)
     }
 }

@@ -126,7 +126,7 @@ impl<'a> RequestBuilder<'a> {
         Ok((request, self.http_client))
     }
 
-    /// Send the request and return a [`hyper::Result']
+    /// Send the request and return a [`hyper::Result`]
     pub async fn into_response(self) -> Result<hyper::Response<Body>> {
         let (request, client) = self.into_request()?;
         Ok(client.send_request(request).await?)

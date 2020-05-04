@@ -14,12 +14,13 @@ use std::path::PathBuf;
 /// async fn main() -> Result<()> {
 ///     let id = "CONTAINER_ID";
 ///
-///     Docker::new()
+///     let response = Docker::new()
 ///         .containers()
-///         .remove(id)
-///         .force(true)
+///         .inspect(id)
 ///         .send()
 ///         .await?;
+///
+///     println!("{:#?}", response);
 ///
 ///     Ok(())
 /// }

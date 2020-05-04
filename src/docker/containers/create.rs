@@ -79,21 +79,15 @@ impl<'a> Body<'a> {
     }
 }
 
+/// Response returned when creating a new container
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Response {
-    id: String,
-    warnings: Vec<String>,
-}
+    /// The ID of the container
+    pub id: String,
 
-impl Response {
-    pub fn id(&self) -> &String {
-        &self.id
-    }
-
-    pub fn warnings(&self) -> &Vec<String> {
-        &self.warnings
-    }
+    /// Warnings encountered while creating the container
+    pub warnings: Vec<String>,
 }
 
 #[cfg(test)]

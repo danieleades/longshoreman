@@ -12,7 +12,7 @@ async fn test() -> Result<()> {
     images.pull(image).tag("latest").send().await?;
 
     // Create a simple container
-    let id = containers.create(image).send().await?.id().clone();
+    let id = containers.create(image).send().await?.id;
 
     // Inspect it
     let _response = containers.inspect(&id).size(true).send().await?;

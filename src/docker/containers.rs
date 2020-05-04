@@ -4,7 +4,7 @@ use crate::http_client::HttpClient;
 use std::sync::Arc;
 
 mod create;
-pub use create::Create;
+pub use create::{Create, Response as CreateResponse};
 
 mod remove;
 pub use remove::Remove;

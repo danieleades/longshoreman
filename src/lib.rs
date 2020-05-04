@@ -12,3 +12,5 @@ mod http_client;
 
 pub use docker::{containers, images, Docker};
 pub use error::{Error, Result};
+
+mod utils;

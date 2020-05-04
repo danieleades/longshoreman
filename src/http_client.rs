@@ -33,9 +33,9 @@ impl HttpClient {
         RequestBuilder::new(self, endpoint)
     }
 
-    /*     pub fn get(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
+    pub fn get(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
         self.request(endpoint).method(Method::GET)
-    } */
+    }
 
     pub fn post(&self, endpoint: impl AsRef<str>) -> RequestBuilder {
         self.request(endpoint).method(Method::POST)

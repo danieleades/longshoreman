@@ -9,6 +9,9 @@ pub use create::Create;
 mod remove;
 pub use remove::Remove;
 
+mod inspect;
+pub use inspect::{Inspect, Response as InspectResponse, State, Status};
+
 /// A client to the 'containers' subset of Docker API endpoints
 #[derive(Debug)]
 pub struct Containers {
@@ -31,5 +34,12 @@ impl Containers {
     /// The 'container' parameter may be a name or an id.
     pub fn remove<'a>(&'a self, container: &'a str) -> Remove<'a> {
         Remove::new(&self.http_client, container)
+    }
+
+    /// Retrieve details about an existing Docker container
+    ///
+    /// The 'container' parameter may be a name or an id.
+    pub fn inspect<'a>(&'a self, container: &'a str) -> Inspect<'a> {
+        Inspect::new(&self.http_client, container)
     }
 }

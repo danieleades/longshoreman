@@ -46,6 +46,7 @@ impl<'a> Inspect<'a> {
     /// `size_root_fs`.
     ///
     /// default is 'false'.
+    #[must_use]
     pub fn size(mut self, size: bool) -> Self {
         self.query.size = size;
         self

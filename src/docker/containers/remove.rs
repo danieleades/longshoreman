@@ -50,6 +50,7 @@ impl<'a> Remove<'a> {
     /// Whether to force removal of a container, even if it is still running.
     ///
     /// default is 'false'.
+    #[must_use]
     pub fn force(mut self, force: bool) -> Self {
         self.query.force = force;
         self

@@ -6,13 +6,10 @@ use futures_util::{
 };
 use hyper::{
     body::{to_bytes, Bytes},
-    header::IntoHeaderName,
     Body, Method, Request, StatusCode,
 };
 use serde::{Deserialize, Serialize};
-use std::{convert::TryFrom, io};
-use tokio::io::{stream_reader, AsyncRead, AsyncWrite};
-use tokio_util::codec::{Decoder, FramedRead};
+use std::convert::TryFrom;
 
 /// A builder API for constructing and sending an HTTP request to the Docker
 /// host.
@@ -64,11 +61,11 @@ impl<'a> RequestBuilder<'a> {
     }
 
     /// Add a custom header to the request
-    pub fn header(mut self, key: impl IntoHeaderName, value: &str) -> Self {
+    /*     pub fn header(mut self, key: impl IntoHeaderName, value: &str) -> Self {
         let value = http::header::HeaderValue::from_str(value).unwrap();
         self.builder.headers_mut().unwrap().append(key, value);
         self
-    }
+    } */
 
     /// Add a form-encoded query to the request.
     ///
@@ -164,7 +161,7 @@ impl<'a> RequestBuilder<'a> {
     }
 
     /// Upgrade the HTTP connection into a duplex stream
-    pub async fn upgrade(mut self) -> Result<impl AsyncRead + AsyncWrite> {
+    /*     pub async fn upgrade(mut self) -> Result<impl AsyncRead + AsyncWrite> {
         self = self.header(hyper::header::CONNECTION, "Upgrade");
         self = self.header(hyper::header::UPGRADE, "tcp");
 
@@ -174,7 +171,7 @@ impl<'a> RequestBuilder<'a> {
             StatusCode::SWITCHING_PROTOCOLS => Ok(hyper_response.into_body().on_upgrade().await?),
             _ => Err(Error::ConnectionNotUpgraded),
         }
-    }
+    } */
 
     /// Send the request and concatenate the response into a Bytes object
     async fn into_bytes(self) -> Result<Bytes> {
@@ -182,11 +179,11 @@ impl<'a> RequestBuilder<'a> {
         Ok(to_bytes(body).await?)
     }
 
-    /// Send the request, and concatenate the response into a string
+    /*     /// Send the request, and concatenate the response into a string
     pub async fn into_string(self) -> Result<String> {
         let bytes = self.into_bytes().await?;
         Ok(String::from_utf8(bytes.to_vec())?)
-    }
+    } */
 
     /// Send the request and deserialize the JSON body response into an object
     pub async fn into_json<T>(self) -> Result<T>
@@ -223,7 +220,7 @@ impl<'a> RequestBuilder<'a> {
         byte_stream.and_then(|bytes| async move { Ok(serde_json::from_slice(&bytes)?) })
     }
 
-    /// Send the request, and deserialize the returned stream using the given
+    /*     /// Send the request, and deserialize the returned stream using the given
     /// codec
     pub fn decode<T, C, I, E>(self, codec: C) -> impl Stream<Item = Result<T>> + 'a
     where
@@ -241,7 +238,7 @@ impl<'a> RequestBuilder<'a> {
         FramedRead::new(reader, codec)
             .map_err(Error::from)
             .and_then(|bytes| async move { Ok(serde_json::from_slice(bytes.as_ref())?) })
-    }
+    } */
 }
 
 fn get_error_message(bytes: impl AsRef<[u8]>) -> Result<String> {

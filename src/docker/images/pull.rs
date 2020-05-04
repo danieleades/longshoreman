@@ -56,6 +56,7 @@ impl<'a> Pull<'a> {
 
     /// Choose the tag of the image to pull. If unset, *all* tags will be
     /// pulled.
+    #[must_use]
     pub fn tag(mut self, tag: &'a str) -> Self {
         self.query.tag = Some(tag);
         self

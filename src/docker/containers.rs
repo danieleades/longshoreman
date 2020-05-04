@@ -32,6 +32,7 @@ impl Containers {
     /// Remove an existing Docker container
     ///
     /// The 'container' parameter may be a name or an id.
+    #[must_use]
     pub fn remove<'a>(&'a self, container: &'a str) -> Remove<'a> {
         Remove::new(&self.http_client, container)
     }
@@ -39,6 +40,7 @@ impl Containers {
     /// Retrieve details about an existing Docker container
     ///
     /// The 'container' parameter may be a name or an id.
+    #[must_use]
     pub fn inspect<'a>(&'a self, container: &'a str) -> Inspect<'a> {
         Inspect::new(&self.http_client, container)
     }

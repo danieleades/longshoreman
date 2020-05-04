@@ -2,6 +2,26 @@ use crate::{http_client::HttpClient, Result};
 use serde::Serialize;
 
 /// A request to remove an existing docker container
+///
+/// # Example
+///
+/// ```no_run
+/// use longshoreman::{Docker, Result};
+///
+/// #[tokio::main]
+/// async fn main() -> Result<()> {
+///     let id = "CONTAINER_ID";
+///
+///     Docker::new()
+///         .containers()
+///         .remove(id)
+///         .force(true)
+///         .send()
+///         .await?;
+///
+///     Ok(())
+/// }
+/// ```
 #[derive(Debug)]
 pub struct Remove<'a> {
     http_client: &'a HttpClient,

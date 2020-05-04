@@ -14,6 +14,9 @@ async fn test() -> Result<()> {
     // Create a simple container
     let id = containers.create(image).send().await?.id().clone();
 
+    // Inspect it
+    let _response = containers.inspect(&id).send().await?;
+
     containers.remove(&id).send().await?;
 
     Ok(())

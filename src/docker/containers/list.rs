@@ -24,6 +24,15 @@ impl<'a> List<'a> {
         self
     }
 
+    /// List, at most, a given number of containers
+    ///
+    /// Leave unset to return all containers
+    #[must_use]
+    pub fn limit(mut self, limit: u16) -> Self {
+        self.query.limit = Some(limit);
+        self
+    }
+
     /// Consume the request and return a list of Docker containers
     pub async fn send(self) -> Result<Vec<Response>> {
         self.http_client
@@ -103,9 +112,7 @@ struct HostConfig {
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-struct NetworkSettings {
-    network_mode: String,
-}
+struct NetworkSettings {}
 
 #[derive(Debug, Clone, Deserialize)]
 struct Mount {}

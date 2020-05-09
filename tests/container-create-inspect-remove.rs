@@ -19,6 +19,7 @@ async fn test() -> Result<()> {
         containers
             .list()
             .all(true)
+            .limit(100)
             .send()
             .await?
             .into_iter()

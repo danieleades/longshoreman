@@ -15,6 +15,15 @@ impl<'a> List<'a> {
         Self { http_client, query }
     }
 
+    /// Show stopped containers as well as running containers.
+    ///
+    /// default is false.
+    #[must_use]
+    pub fn all(mut self, all: bool) -> Self {
+        self.query.all = all;
+        self
+    }
+
     /// Consume the request and return a list of Docker containers
     pub async fn send(self) -> Result<Vec<Response>> {
         self.http_client
@@ -49,7 +58,15 @@ pub struct Response {
     state: State,
     status: String,
     host_config: HostConfig,
+    network_settings: NetworkSettings,
     mounts: Vec<Mount>,
+}
+
+impl Response {
+    /// The name of the image from which this container was made
+    pub fn image(&self) -> &String {
+        &self.image
+    }
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -71,12 +88,24 @@ enum PortType {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "lowercase")]
 enum State {
     Exited,
+    Created,
+    Running,
 }
 
 #[derive(Debug, Clone, Deserialize)]
-struct HostConfig {}
+#[serde(rename_all = "PascalCase")]
+struct HostConfig {
+    network_mode: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+struct NetworkSettings {
+    network_mode: String,
+}
 
 #[derive(Debug, Clone, Deserialize)]
 struct Mount {}
@@ -98,7 +127,7 @@ mod tests {
     "ImageID": "d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82",
     "Command": "echo 1",
     "Created": 1367854155,
-    "State": "Exited",
+    "State": "exited",
     "Status": "Exit 0",
     "Ports": [
       {
@@ -153,7 +182,7 @@ mod tests {
     "ImageID": "d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82",
     "Command": "echo 222222",
     "Created": 1367854155,
-    "State": "Exited",
+    "State": "created",
     "Status": "Exit 0",
     "Ports": [],
     "Labels": {},
@@ -188,7 +217,7 @@ mod tests {
     "ImageID": "d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82",
     "Command": "echo 3333333333333333",
     "Created": 1367854154,
-    "State": "Exited",
+    "State": "running",
     "Status": "Exit 0",
     "Ports": [],
     "Labels": {},
@@ -223,7 +252,7 @@ mod tests {
     "ImageID": "d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82",
     "Command": "echo 444444444444444444444444444444444",
     "Created": 1367854152,
-    "State": "Exited",
+    "State": "exited",
     "Status": "Exit 0",
     "Ports": [],
     "Labels": {},

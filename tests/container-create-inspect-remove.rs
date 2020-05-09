@@ -14,6 +14,17 @@ async fn test() -> Result<()> {
     // Create a simple container
     let id = containers.create(image).send().await?.id;
 
+    // list containers and assert that it's there
+    assert!(
+        containers
+            .list()
+            .all(true)
+            .send()
+            .await?
+            .into_iter()
+            .any(|container| container.image() == image)
+    );
+
     // Inspect it
     let _response = containers.inspect(&id).size(true).send().await?;
 

@@ -2,7 +2,36 @@ use crate::{http_client::HttpClient, Result};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, net::IpAddr};
 
-/// A request to list local images
+/// A request to list local containers
+///
+/// # Example
+/// ```no_run
+/// use longshoreman::{Docker, Result};
+///
+/// #[tokio::main]
+/// async fn main() -> Result<()> {
+///     let containers = Docker::new()
+///         .containers()
+///         // list containers
+///         .list()
+///
+///         // include stopped containers
+///         .all(true)
+///
+///         // return at most 10 containers
+///         .limit(10)
+///
+///         // send request, and await the response
+///         .send()
+///         .await?;
+///
+///     for container in containers {
+///         println!("{:#?}", container);
+///     }
+///
+///     Ok(())
+/// }
+/// ```
 #[derive(Debug, Clone)]
 pub struct List<'a> {
     http_client: &'a HttpClient,
@@ -50,6 +79,7 @@ struct Query {
     size: bool,
 }
 
+/// A representation of a local Docker container
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Response {
@@ -72,9 +102,24 @@ pub struct Response {
 }
 
 impl Response {
+    /// The unique ID of the container
+    pub fn id(&self) -> &String {
+        &self.id
+    }
+
+    /// The names associated with this container
+    pub fn names(&self) -> &Vec<String> {
+        &self.names
+    }
+
     /// The name of the image from which this container was made
     pub fn image(&self) -> &String {
         &self.image
+    }
+
+    /// The unique ID of the image from which this container was made
+    pub fn image_id(&self) -> &String {
+        &self.image_id
     }
 }
 

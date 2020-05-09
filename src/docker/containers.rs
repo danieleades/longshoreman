@@ -7,7 +7,7 @@ mod create;
 pub use create::{Create, Response as CreateResponse};
 
 mod list;
-pub use list::List;
+pub use list::{List, Response as ListResponse};
 
 mod remove;
 pub use remove::Remove;

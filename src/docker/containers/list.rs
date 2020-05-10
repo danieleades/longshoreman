@@ -106,7 +106,9 @@ pub struct Response {
     ports: Vec<Port>,
     size_rw: Option<i64>,
     size_root_fs: Option<i64>,
-    labels: HashMap<String, String>,
+
+    /// [Docker 'labels'](https://docs.docker.com/config/labels-custom-metadata/) that exist on this container.
+    pub labels: HashMap<String, String>,
     state: State,
     status: String,
     host_config: HostConfig,

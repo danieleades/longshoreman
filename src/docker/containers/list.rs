@@ -1,4 +1,5 @@
 use crate::{http_client::HttpClient, Result};
+use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, net::IpAddr};
 
@@ -97,7 +98,11 @@ pub struct Response {
     pub image_id: String,
 
     command: String,
-    created: i64,
+
+    /// The time the container was created
+    #[serde(with = "ts_seconds")]
+    pub created: DateTime<Utc>,
+
     ports: Vec<Port>,
     size_rw: Option<i64>,
     size_root_fs: Option<i64>,

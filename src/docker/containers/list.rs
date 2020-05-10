@@ -83,11 +83,19 @@ struct Query {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Response {
-    id: String,
-    names: Vec<String>,
-    image: String,
+    /// The unique ID of the container
+    pub id: String,
+
+    /// The names associated with this container
+    pub names: Vec<String>,
+
+    /// The name of the image from which this container was made
+    pub image: String,
+
+    /// The unique ID of the image from which this container was made
     #[serde(rename = "ImageID")]
-    image_id: String,
+    pub image_id: String,
+
     command: String,
     created: i64,
     ports: Vec<Port>,
@@ -99,28 +107,6 @@ pub struct Response {
     host_config: HostConfig,
     network_settings: NetworkSettings,
     mounts: Vec<Mount>,
-}
-
-impl Response {
-    /// The unique ID of the container
-    pub fn id(&self) -> &String {
-        &self.id
-    }
-
-    /// The names associated with this container
-    pub fn names(&self) -> &Vec<String> {
-        &self.names
-    }
-
-    /// The name of the image from which this container was made
-    pub fn image(&self) -> &String {
-        &self.image
-    }
-
-    /// The unique ID of the image from which this container was made
-    pub fn image_id(&self) -> &String {
-        &self.image_id
-    }
 }
 
 #[derive(Debug, Clone, Deserialize)]

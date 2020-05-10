@@ -6,6 +6,9 @@ use std::sync::Arc;
 mod create;
 pub use create::{Create, Response as CreateResponse};
 
+mod list;
+pub use list::{List, Response as ListResponse};
+
 mod remove;
 pub use remove::Remove;
 
@@ -21,6 +24,12 @@ pub struct Containers {
 impl Containers {
     pub(crate) fn new(http_client: Arc<HttpClient>) -> Self {
         Self { http_client }
+    }
+
+    /// List local containers
+    #[must_use]
+    pub fn list(&self) -> List {
+        List::new(&self.http_client)
     }
 
     /// Create a new Docker container

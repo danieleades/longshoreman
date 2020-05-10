@@ -12,7 +12,24 @@ async fn test() -> Result<()> {
     images.pull(image).tag("latest").send().await?;
 
     // Create a simple container
-    let id = containers.create(image).send().await?.id;
+    let id = containers
+        .create(image)
+        .name("my-cool-container")
+        .send()
+        .await?
+        .id;
+
+    // list containers and assert that it's there
+    assert!(
+        containers
+            .list()
+            .all(true)
+            .limit(100)
+            .send()
+            .await?
+            .into_iter()
+            .any(|container| container.image == image)
+    );
 
     // Inspect it
     let _response = containers.inspect(&id).size(true).send().await?;

@@ -3,14 +3,23 @@ name = "longshoreman"
 version = "0.1.0"
 authors = ["Daniel Eades <danieleades@hotmail.com>"]
 edition = "2018"
+description = "asynchronous Docker client in pure Rust"
+repository = "https://github.com/danieleades/longshoreman"
+license = "MIT"
+keywords = ["docker", "async", "containers", "asynchronous"]
+categories = ["api-bindings"]
+
+[badges]
+codecov = {repository = "danieleades/longshoreman"}
+maintenance = {status="actively-developed"}
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 hyper = "0.13.5"
-pin-project = "0.4.9"
+pin-project = "0.4.10"
 futures-util = { version = "0.3.4", features = ["io"] }
-tokio = {version = "0.2.20", features = ["stream", "io-util"]}
+tokio = { version = "0.2.20", features = ["stream", "io-util"] }
 serde = { version = "1.0.106", features = ["derive"] }
 tokio-util = { version = "0.3.1", features = ["codec"] }
 http = "0.2.1"
@@ -18,7 +27,7 @@ mime = "0.3.16"
 serde_json = "1.0.52"
 serde_urlencoded = "0.6.1"
 thiserror = "1.0.16"
-chrono = {version = "0.4.11", features = ["serde"] }
+chrono = { version = "0.4.11", features = ["serde"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 hyperlocal = "0.7.0"

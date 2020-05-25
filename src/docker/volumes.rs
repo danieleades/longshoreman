@@ -1,11 +1,10 @@
-//! Endpoints and objects for juggling Docker images
+//! Endpoints and objects for juggling Docker volumes
 
 use crate::{http_client::HttpClient, Result};
 use std::sync::Arc;
 
-pub mod inspect;
-#[doc(inline)]
-pub use inspect::Inspect;
+mod inspect;
+pub use inspect::{Inspect, Response as InspectResponse};
 
 /// A client to the 'images' subset of Docker API endpoints
 #[derive(Debug)]
@@ -18,7 +17,8 @@ impl Volumes {
         Self { http_client }
     }
 
-    pub async fn inspect<'a>(&'a self, name: &'a str) -> Result<inspect::Response> {
+    /// Inspect a Docker volume
+    pub async fn inspect<'a>(&'a self, name: &'a str) -> Result<InspectResponse> {
         Inspect::new(&self.http_client, name).send().await
     }
 }

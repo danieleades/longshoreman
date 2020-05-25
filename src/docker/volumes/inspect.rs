@@ -56,10 +56,12 @@ pub struct Response {
     /// The location on the host filesystem where the volume is mounted
     pub mountpoint: PathBuf,
 
-    /// TODO
-    pub status: Status,
+    /// Low-level details about the volume, provided by the volume driver
+    #[serde(default)]
+    pub status: HashMap<String, String>,
 
-    /// docker labels on this volume
+    /// User-defined key/value metadata
+    #[serde(default)]
     pub labels: HashMap<String, String>,
 
     /// The scope of the volume
@@ -73,10 +75,13 @@ pub struct Response {
 #[derive(Debug, Deserialize)]
 pub struct Status {}
 
+/// The level at which the volume exists
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Scope {
+    /// machine level
     Local,
+    /// cluster-wide
     Global,
 }
 

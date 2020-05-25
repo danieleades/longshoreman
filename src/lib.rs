@@ -10,7 +10,7 @@ mod docker;
 mod error;
 mod http_client;
 
-pub use docker::{containers, images, Docker};
+pub use docker::{containers, images, volumes, Docker};
 pub use error::{Error, Result};
 
 mod utils;

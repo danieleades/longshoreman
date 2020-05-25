@@ -1,7 +1,4 @@
-use crate::{http_client::HttpClient, Result};
-use chrono::{DateTime, Utc};
-use serde::Deserialize;
-use std::{collections::HashMap, path::PathBuf};
+use crate::{http_client::HttpClient, volumes::Volume, Result};
 
 /// A request to remove an existing docker container
 ///
@@ -36,53 +33,10 @@ impl<'a> Inspect<'a> {
     }
 
     /// Consume the request and return details about the container
-    pub async fn send(self) -> Result<Response> {
+    pub async fn send(self) -> Result<Volume> {
         let endpoint = format!("/volumes/{}", self.name);
         self.http_client.get(endpoint).into_json().await
     }
-}
-
-/// A struct representation the information returned by a 'container inspect'
-/// command
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct Response {
-    /// The name of the Docker volume
-    pub name: String,
-
-    /// The volume driver
-    pub driver: String,
-
-    /// The location on the host filesystem where the volume is mounted
-    pub mountpoint: PathBuf,
-
-    /// Low-level details about the volume, provided by the volume driver
-    #[serde(default)]
-    pub status: HashMap<String, String>,
-
-    /// User-defined key/value metadata
-    #[serde(default)]
-    pub labels: HashMap<String, String>,
-
-    /// The scope of the volume
-    pub scope: Scope,
-
-    /// The datetime that the container was created
-    pub created_at: DateTime<Utc>,
-}
-
-/// The state of a docker container
-#[derive(Debug, Deserialize)]
-pub struct Status {}
-
-/// The level at which the volume exists
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum Scope {
-    /// machine level
-    Local,
-    /// cluster-wide
-    Global,
 }
 
 #[cfg(test)]
@@ -91,7 +45,7 @@ mod tests {
 
     #[test]
     fn deserialise_response() {
-        let _: Response = serde_json::from_str(
+        let _: Volume = serde_json::from_str(
             r#"{
                 "Name": "tardis",
                 "Driver": "custom",

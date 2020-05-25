@@ -8,6 +8,9 @@ use images::Images;
 pub mod containers;
 use containers::Containers;
 
+pub mod volumes;
+use volumes::Volumes;
+
 /// A Docker client.
 ///
 /// The [`Docker`] client provides top-level API endpoints, and is used to
@@ -118,7 +121,7 @@ impl Docker {
         Images::new(Arc::clone(&self.http_client))
     }
 
-    /// Return an [`Containers`] client.
+    /// Return a [`Containers`] client.
     ///
     /// See the [`Containers`] client docs for more details
     ///
@@ -131,5 +134,20 @@ impl Docker {
     #[must_use]
     pub fn containers(&self) -> Containers {
         Containers::new(Arc::clone(&self.http_client))
+    }
+
+    /// Return a [`Volumes`] client.
+    ///
+    /// See the [`Volumes`] client docs for more details
+    ///
+    /// # Example
+    /// ```
+    /// use longshoreman::Docker;
+    ///
+    /// let volumes = Docker::new().volumes();
+    /// ```
+    #[must_use]
+    pub fn volumes(&self) -> Volumes {
+        Volumes::new(Arc::clone(&self.http_client))
     }
 }

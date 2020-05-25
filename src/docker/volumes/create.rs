@@ -17,7 +17,7 @@ use std::collections::HashMap;
 ///         .send()
 ///         .await?;
 ///
-///     println!("{:#?}", volume)
+///     println!("{:#?}", volume);
 ///
 ///     Ok(())
 /// }
@@ -39,6 +39,8 @@ use std::collections::HashMap;
 ///         .label("key", "value")
 ///         .send()
 ///         .await?;
+///
+///     println!("{:#?}", volume);
 ///
 ///     Ok(())
 /// }

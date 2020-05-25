@@ -5,20 +5,38 @@ use std::collections::HashMap;
 /// A request to create a new docker container
 ///
 /// # Example
+///
 /// ```no_run
 /// use longshoreman::{Docker, Result};
 ///
-/// #[tokio::main]
-/// async fn main() -> Result<()> {
-///     let containers = Docker::new().containers();
+/// #[tokio::test]
+/// async fn test() -> Result<()> {
+///     let volume = Docker::new()
+///         .volumes()
+///         .create()
+///         .send()
+///         .await?;
 ///
-///     // Create a simple container
-///     containers.create("alpine").send().await?;
+///     println!("{:#?}", volume)
 ///
-///     // Create a more complex example
-///     containers
-///         .create("alpine")
-///         .name("my-cool-container")
+///     Ok(())
+/// }
+/// ```
+///
+/// # Example
+///
+/// ```no_run
+/// use longshoreman::{Docker, Result};
+///
+/// #[tokio::test]
+/// async fn test() -> Result<()> {
+///
+///     let volume = Docker::new()
+///         .volumes()
+///         .create()
+///         .name("my-volume")
+///         .driver("local")
+///         .label("key", "value")
 ///         .send()
 ///         .await?;
 ///

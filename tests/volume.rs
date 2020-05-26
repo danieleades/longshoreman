@@ -8,7 +8,9 @@ async fn test() -> Result<()> {
         .create()
         .name("my-volume")
         .driver("local")
-        //.driver_opt("device", "tmpfs")
+        .driver_opt("type", "tmpfs")
+        .driver_opt("device", "tmpfs")
+        .driver_opt("o", "size=100m,uid=1000")
         .label("key", "value")
         .send()
         .await?;

@@ -2,7 +2,7 @@ use crate::{http_client::HttpClient, volumes::Volume, Result};
 use serde::Serialize;
 use std::collections::HashMap;
 
-/// A request to create a new docker container
+/// A request to create a new docker volume
 ///
 /// # Example
 ///

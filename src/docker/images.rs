@@ -2,13 +2,16 @@
 
 use crate::http_client::HttpClient;
 use std::sync::Arc;
-use tokio::io::AsyncRead;
+use tokio::io::{AsyncRead, AsyncWrite};
 
 mod load;
 pub use load::Load;
 
 mod pull;
 pub use pull::Pull;
+
+mod get;
+pub use get::Get;
 
 /// A client to the 'images' subset of Docker API endpoints
 #[derive(Debug)]
@@ -55,5 +58,11 @@ impl Images {
     #[must_use]
     pub fn pull<'a>(&'a self, name: &'a str) -> Pull<'a> {
         Pull::new(&self.http_client, name)
+    }
+
+    /// Exports an image
+    #[must_use]
+    pub fn get<'a>(&'a self, name: &'a str, tar_output: impl AsyncWrite + 'a) -> Get<'a> {
+        Get::new(&self.http_client, name, tar_output)
     }
 }

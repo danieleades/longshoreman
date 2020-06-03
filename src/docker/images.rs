@@ -2,7 +2,7 @@
 
 use crate::http_client::HttpClient;
 use std::sync::Arc;
-use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::io::AsyncRead;
 
 mod load;
 pub use load::Load;
@@ -62,7 +62,7 @@ impl Images {
 
     /// Exports an image
     #[must_use]
-    pub fn get<'a>(&'a self, name: &'a str, tar_output: impl AsyncWrite + 'a) -> Get<'a> {
-        Get::new(&self.http_client, name, tar_output)
+    pub fn get<'a>(&'a self, names: &'a Vec<&'a str>) -> Get<'a> {
+        Get::new(&self.http_client, names)
     }
 }

@@ -14,10 +14,13 @@ async fn image_get_load() -> Result<()> {
     images.pull(image).tag("latest").send().await?;
 
     let tmp_file = NamedTempFile::new()?;
-    let export_to = File::from_std(tmp_file.reopen()?);
+    let export_to = tmp_file.reopen()?;
 
     // Export image
-    images.get("alpine:latest", export_to).send().await?;
+    images
+        .get(&vec!["alpine:latest"])
+        .to_writer(File::from_std(export_to))
+        .await?;
 
     // Import
     let x = images

@@ -1,8 +1,8 @@
 use crate::{http_client::HttpClient, Result};
-use futures_util::stream::StreamExt;
+use futures_util::stream::TryStreamExt;
 use serde::Serialize;
-use std::{fmt, pin::Pin};
-use tokio::io::{AsyncWrite, AsyncWriteExt};
+use tokio::io::{self, AsyncRead, AsyncWrite};
+use tokio_util::compat::FuturesAsyncReadCompatExt;
 /// A request to get a tarball containing an image
 ///
 /// # Example
@@ -29,38 +29,24 @@ use tokio::io::{AsyncWrite, AsyncWriteExt};
 ///     Ok(())
 /// }
 /// ```
+#[derive(Debug)]
 pub struct Get<'a> {
     http_client: &'a HttpClient,
-    image: &'a str,
-    write_to: Pin<Box<dyn AsyncWrite + 'a>>,
-}
-impl fmt::Debug for Get<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Get")
-            .field("http_client", &self.http_client)
-            .field("image", &self.image)
-            .finish()
-    }
+    images: &'a Vec<&'a str>,
 }
 
 impl<'a> Get<'a> {
-    pub(crate) fn new(
-        http_client: &'a HttpClient,
-        image: &'a str,
-        write_to: impl AsyncWrite + 'a,
-    ) -> Self {
-        let write_to = Box::pin(write_to);
+    pub(crate) fn new(http_client: &'a HttpClient, images: &'a Vec<&'a str>) -> Self {
         Self {
             http_client,
-            image,
-            write_to,
+            images,
         }
     }
 
     /// Consume the request and get the image
-    pub async fn send(mut self) -> Result<()> {
+    pub fn send(self) -> Box<dyn AsyncRead + 'a + Unpin> {
         let endpoint = "/images/get";
-        let mut request = Box::pin(
+        let byte_stream = Box::pin(
             self.http_client
                 .get(endpoint)
                 .query(Query {
@@ -70,16 +56,22 @@ impl<'a> Get<'a> {
                     // but: serde-encoded doesn't support serialization of Vec<T>
                     // https://github.com/nox/serde_urlencoded/issues/6
                     // Ignore this feature or implement it ourselves?
-                    names: self.image,
+                    // FIXME
+                    names: self.images[0],
                 })
-                .into_stream(),
-        );
+                .into_stream()
+                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e)),
+        )
+        .into_async_read()
+        .compat();
 
-        while let Some(bytes) = request.next().await {
-            let bytes = bytes?;
-            self.write_to.write_all(&bytes).await?;
-        }
+        Box::new(byte_stream)
+    }
 
+    /// TODO docs
+    pub async fn to_writer(self, mut writer: impl AsyncWrite + 'a + Unpin) -> Result<()> {
+        let mut stream = self.send();
+        io::copy(&mut stream, &mut writer).await?;
         Ok(())
     }
 }

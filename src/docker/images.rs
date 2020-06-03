@@ -62,7 +62,7 @@ impl Images {
 
     /// Exports an image
     #[must_use]
-    pub fn get<'a>(&'a self, names: &'a Vec<&'a str>) -> Get<'a> {
+    pub fn get<'a>(&'a self, names: &'a [&'a str]) -> Get<'a> {
         Get::new(&self.http_client, names)
     }
 }

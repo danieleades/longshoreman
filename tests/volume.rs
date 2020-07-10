@@ -1,7 +1,7 @@
 use longshoreman::{Docker, Result};
 
 #[tokio::test]
-async fn volume() -> Result<()> {
+async fn test() -> Result<()> {
     let volumes = Docker::new().volumes();
 
     let volume1 = volumes

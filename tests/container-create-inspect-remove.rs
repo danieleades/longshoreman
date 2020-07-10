@@ -1,7 +1,7 @@
 use longshoreman::{Docker, Result};
 
 #[tokio::test]
-async fn create_inspect_remove() -> Result<()> {
+async fn test() -> Result<()> {
     let docker = Docker::new();
     let images = docker.images();
     let containers = docker.containers();

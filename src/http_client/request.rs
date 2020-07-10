@@ -71,7 +71,6 @@ impl<'a> RequestBuilder<'a> {
     ///
     /// Any type that implements [`serde::Deserialize`] can be used
     pub fn query<T: Serialize>(mut self, query: T) -> Self {
-        // TODO: Maybe this shouldn't panic?
         let query_string = serde_urlencoded::ser::to_string(query).unwrap();
 
         self.query = Some(query_string);

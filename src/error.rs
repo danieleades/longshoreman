@@ -14,10 +14,6 @@ pub enum Error {
     #[error(transparent)]
     SerdeJson(#[from] serde_json::Error),
 
-    /// Errors that occur when serialising query strings
-    #[error(transparent)]
-    SerdeUrlEncoded(#[from] serde_urlencoded::ser::Error),
-
     /// Errors from the underlying Hyper crate
     #[error(transparent)]
     Hyper(#[from] hyper::Error),

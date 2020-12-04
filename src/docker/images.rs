@@ -4,6 +4,9 @@ use crate::http_client::HttpClient;
 use std::sync::Arc;
 use tokio::io::AsyncRead;
 
+mod build;
+pub use build::Build;
+
 mod load;
 pub use load::Load;
 
@@ -56,4 +59,10 @@ impl Images {
     pub fn pull<'a>(&'a self, name: &'a str) -> Pull<'a> {
         Pull::new(&self.http_client, name)
     }
+
+     /// Pull an image
+     #[must_use]
+     pub fn build<'a>(&'a self, tar_archive: impl AsyncRead + 'a) -> Build<'a> {
+         Build::new(&self.http_client, tar_archive)
+     }
 }

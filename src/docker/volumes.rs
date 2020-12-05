@@ -24,6 +24,7 @@ impl Volumes {
     }
 
     /// Create a new Docker volume
+    #[must_use]
     pub fn create(&self) -> Create {
         Create::new(&self.http_client)
     }

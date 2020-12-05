@@ -80,7 +80,7 @@ pub struct Response {
     /// The datetime that the container was created
     pub created: DateTime<Utc>,
 
-    /// The driver runnning the container
+    /// The driver running the container
     pub driver: String,
 
     /// The path on the host to the file containing the container hostname
@@ -109,6 +109,7 @@ pub struct Response {
 }
 
 /// The state of a docker container
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct State {
@@ -119,7 +120,7 @@ pub struct State {
     /// Exit code for the container
     pub exit_code: i32,
 
-    /// The timestamp at thich the container finished
+    /// The timestamp at which the container finished
     pub finished_at: DateTime<Utc>,
 
     /// True if the container is 'dead'
@@ -169,6 +170,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[allow(clippy::clippy::too_many_lines)]
     fn deserialise_response() {
         let _: Response = serde_json::from_str(
         r#"{

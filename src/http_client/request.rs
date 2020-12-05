@@ -152,7 +152,7 @@ impl<'a> RequestBuilder<'a> {
                     message: get_error_message(&bytes).unwrap_or_else(|_| {
                         status
                             .canonical_reason()
-                            .unwrap_or_else(|| "unknown error code")
+                            .unwrap_or("unknown error code")
                             .to_owned()
                     }),
                 })

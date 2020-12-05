@@ -42,6 +42,7 @@ impl<'a> Remove<'a> {
     /// Whether to also remove volumes associated with the container.
     ///
     /// default is 'false'.
+    #[must_use]
     pub fn remove_volumes(mut self, remove_volumes: bool) -> Self {
         self.query.v = remove_volumes;
         self

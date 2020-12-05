@@ -159,8 +159,9 @@ struct Mount {}
 mod tests {
     use super::Response;
     #[test]
+    #[allow(clippy::clippy::too_many_lines)]
     fn deserialise_response() {
-        let _: Vec<Response> = serde_json::from_str(
+        let _responses: Vec<Response> = serde_json::from_str(
             r#"
         [
   {

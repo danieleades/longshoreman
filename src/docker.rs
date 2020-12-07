@@ -11,6 +11,9 @@ use containers::Containers;
 pub mod volumes;
 use volumes::Volumes;
 
+pub mod exec;
+use exec::Exec;
+
 /// A Docker client.
 ///
 /// The [`Docker`] client provides top-level API endpoints, and is used to
@@ -149,5 +152,20 @@ impl Docker {
     #[must_use]
     pub fn volumes(&self) -> Volumes {
         Volumes::new(Arc::clone(&self.http_client))
+    }
+
+    /// Return an [`Exec`] client.
+    ///
+    /// See the [`Exec`] client docs for more details
+    ///
+    /// # Example
+    /// ```
+    /// use longshoreman::Docker;
+    ///
+    /// let exec = Docker::new().exec();
+    /// ```
+    #[must_use]
+    pub fn exec(&self) -> Exec {
+        Exec::new(Arc::clone(&self.http_client))
     }
 }

@@ -62,5 +62,22 @@ mod tests {
             }"#,
         )
         .unwrap();
+
+        let _: Volume = serde_json::from_str(
+            r#"
+            {
+                "CreatedAt": "2020-05-25T22:06:28+01:00",
+                "Driver": "local",
+                "Labels": {
+                    "key": "value"
+                },
+                "Mountpoint": "/var/lib/docker/volumes/my-volume/_data",
+                "Name": "my-volume",
+                "Options": null,
+                "Scope": "local"
+            }
+            "#,
+        )
+        .unwrap();
     }
 }

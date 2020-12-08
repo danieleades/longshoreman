@@ -1,3 +1,4 @@
+use crate::utils::null_as_default;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use std::{collections::HashMap, path::PathBuf};
@@ -16,11 +17,11 @@ pub struct Volume {
     pub mountpoint: PathBuf,
 
     /// Low-level details about the volume, provided by the volume driver
-    #[serde(default)]
+    #[serde(default, deserialize_with = "null_as_default")]
     pub status: HashMap<String, String>,
 
     /// User-defined key/value metadata
-    #[serde(default)]
+    #[serde(default, deserialize_with = "null_as_default")]
     pub labels: HashMap<String, String>,
 
     /// The scope of the volume

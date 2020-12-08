@@ -77,6 +77,15 @@ impl<'a> RequestBuilder<'a> {
         self
     }
 
+    /// Add a form-encoded query to the request.
+    ///
+    /// The provided string will be appended to the request, delimited by '?'.
+    /// For convenience, you probably want to use the provided [`query`] method.
+    pub fn query_string(mut self, query_string: String) -> Self {
+        self.query = Some(query_string);
+        self
+    }
+
     /// Add a JSON body to the request.
     ///
     /// Any type that implements [`serde::Deserialize`] can be used. This method

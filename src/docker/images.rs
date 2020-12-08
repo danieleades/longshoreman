@@ -10,6 +10,9 @@ pub use load::Load;
 mod pull;
 pub use pull::Pull;
 
+mod get;
+pub use get::Get;
+
 /// A client to the 'images' subset of Docker API endpoints
 #[derive(Debug)]
 pub struct Images {
@@ -55,5 +58,11 @@ impl Images {
     #[must_use]
     pub fn pull<'a>(&'a self, name: &'a str) -> Pull<'a> {
         Pull::new(&self.http_client, name)
+    }
+
+    /// Exports an image
+    #[must_use]
+    pub fn get<'a>(&'a self, names: &'a [&'a str]) -> Get<'a> {
+        Get::new(&self.http_client, names)
     }
 }

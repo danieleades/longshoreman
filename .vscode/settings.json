@@ -1,0 +1,22 @@
+{
+    "cSpell.words": [
+        "Blkio",
+        "Cpuset",
+        "Domainname",
+        "Healthcheck",
+        "Mems",
+        "Readonly",
+        "Resolv",
+        "Rootfs",
+        "SIGTERM",
+        "Sysctls",
+        "Ulimits",
+        "armor",
+        "bools",
+        "chrono",
+        "datetime",
+        "devicemapper",
+        "sbin",
+        "timsetamp"
+    ]
+}

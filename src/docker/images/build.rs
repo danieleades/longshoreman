@@ -117,26 +117,22 @@ impl<'a> Build<'a> {
 #[serde(untagged)]
 pub enum Status {
     Progress(Progress),
-    Complete(Complete),
+    Other(Other),
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Other {
+    pub aux: Aux
+}
+#[derive(Debug, Deserialize)]
+pub struct Aux {
+    #[serde(rename = "ID")]
+    id: String
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Progress {
-    pub id: String,
-    pub progress_detail: ProgressDetail,
-    #[serde(rename = "progress")]
-    pub progress_string: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct ProgressDetail {
-    pub current: i64,
-    pub total: i64,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Complete {
     #[serde(rename = "stream")]
     status: String,
 }

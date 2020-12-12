@@ -44,13 +44,10 @@ impl<'a> Build<'a> {
         Box::pin(
             async move {
                 let bytes = self.read_archive().await?;
-                println!("test this shit");
                 let serialized_buildargs=serde_json::to_string(&self.buildargs).unwrap_or_default();
-                print!("{:?}",serialized_buildargs);
                 self.query.buildargs=Some(serialized_buildargs);
               
                 let serialized_labels=serde_json::to_string(&self.labels).unwrap_or_default();
-                print!("{:?}",serialized_labels);
                 self.query.labels=Some(serialized_labels);
                 Ok(self
                     .http_client

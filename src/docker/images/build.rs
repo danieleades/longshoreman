@@ -172,3 +172,22 @@ struct Query<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     outputs: Option<&'a str>,
 }
+#[cfg(test)]
+mod tests {
+
+    use super::{Other, Progress};
+
+
+    #[test]
+    fn complete_deserialisation() {
+        let string = r#"{"stream":"Loaded image: busybox:latest\n"}"#;
+
+        let _: Progress = serde_json::from_str(string).unwrap();
+    }
+
+    #[test]
+    fn aux_deserialisation() {
+        let string = r#"{"aux":{"ID":"sha256:393b8b26c9c7367490906dcf79234323f6b3c36477f6aa4b83660593b066a0fd"}}"#;
+        let _: Other = serde_json::from_str(string).unwrap();
+    }
+}

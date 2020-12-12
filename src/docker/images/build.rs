@@ -137,16 +137,6 @@ pub struct Progress {
     status: String,
 }
 
-impl Complete {
-    pub fn image(&self) -> (&str, &str) {
-        let mut components = self.status.split(':').skip(1);
-
-        let image = components.next().unwrap().trim();
-        let tag = components.next().unwrap().trim();
-
-        (image, tag)
-    }
-}
 #[derive(Debug, Default, Serialize)]
 struct Query<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]

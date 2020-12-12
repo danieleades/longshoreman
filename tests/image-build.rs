@@ -8,13 +8,13 @@ async fn test_image_build() -> Result<()> {
     let images = docker.images();
     let containers = docker.containers();
 
-    let image = "longshoreman/test";
+    let image = "longshoreman/test:1";
     //replace filepath with absolute one
     let archive = File::open("sample_image.tar.gz").await?;
 
     // Pull image
     let mut response_stream = images
-        .build(archive).label("key", "value").buildarg("key", "value").tag("longshoreman/test:1").dockerfile("Dockerfile")
+        .build(archive).label("key", "value").buildarg("key", "value").tag(image).dockerfile("Dockerfile")
         .with_progress();
     while let Some(response) = response_stream.next().await {
         println!("{:?}", response?)
